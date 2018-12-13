@@ -516,46 +516,7 @@ Input:
 
 */
 
-    class Point {
-        Double dis;
-        int[] coor;
-        Point(Double dis, int[] coor) {
-            this.dis = dis;
-            this.coor = coor;
-        }
-    }
 
-    List<List<Integer>> nearestXsteakHouses(int totalSteakhouses,
-                                            List<List<Integer>> allLocations,
-                                            int numSteakhouses)
-    {
-        List<List<Integer>> res = new ArrayList<>();
-
-        if (allLocations == null || allLocations.size() == 0) return res;
-        if (numSteakhouses > totalSteakhouses) return res;
-        PriorityQueue<Point> minHeap = new PriorityQueue<>(1, new Comparator<Point>() {
-            @Override
-            public int compare(Point o1, Point o2) {
-                return o1.dis.compareTo(o2.dis);
-            }
-        });
-
-        for (List<Integer> location : allLocations) {
-            double dis = Math.sqrt(Math.pow(location.get(0), 2.0) + Math.pow(location.get(1), 2.0));
-            minHeap.offer(new Point(dis, new int[]{location.get(0), location.get(1)}));
-        }
-
-//        List<List<Integer>> res = new ArrayList<>();
-        while (numSteakhouses > 0) {
-            Point cur = minHeap.poll();
-            List<Integer> list = new ArrayList<>();
-            list.add(cur.coor[0]);
-            list.add(cur.coor[1]);
-            res.add(list);
-            numSteakhouses--;
-        }
-        return res;
-    }
 
 //    int minimumDistance(int numRows, int numColumns, List<List<Integer>> area)
 //    {
@@ -596,28 +557,54 @@ Input:
 //        dfs(m, i, j - 1, count + 1, visited, des, rows, cols);
 //    }
 
+    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
+        List<Integer> res = new LinkedList<>();
+        if (edges == null || edges.length == 0) {
+            res.add(0);
+            return res;
+        }
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        for (int[] edge : edges) {
+            map.putIfAbsent(edge[0], new ArrayList<>());
+            map.putIfAbsent(edge[1], new ArrayList<>());
+            map.get(edge[0]).add(edge[1]);
+            map.get(edge[1]).add(edge[0]);
+        }
+        int min = Integer.MAX_VALUE;
+        for (int i = 0; i < n; i++) {
+            int height = dfs(i, map, -1);
+            if (height <= min) {
+                if (height < min) {
+                    res = new ArrayList<>();
+                }
+                res.add(i);
+                min = height;
+            }
+        }
+        return res;
+    }
+
+    public int dfs(int node, Map<Integer, List<Integer>> map, int parent) {
+        int maxHeight = 0;
+        for (int neib : map.get(node)) {
+            if (neib  != parent) {
+                maxHeight = Math.max(dfs(neib, map, node), maxHeight);
+            }
+        }
+        return maxHeight + 1;
+    }
+
     public static void main(String[] args) {
         Main main = new Main();
-        List<Integer> list1 = new ArrayList<>();
-        list1.add(1);
-        list1.add(-3);
-
-        List<Integer> list2 = new ArrayList<>();
-        list2.add(1);
-        list2.add(2);
-
-        List<Integer> list3 = new ArrayList<>();
-        list3.add(3);
-        list3.add(4);
-
-        List<List<Integer>> list = new ArrayList<>();
-        list.add(list1);
-        list.add(list2);
-        list.add(list3);
-
-        List<List<Integer>> res = main.nearestXsteakHouses(-4, list, -1);
+        int[][] input = new int[][] {
+                {0,3},
+                {1,3},
+                {2,3},
+                {4,3},
+                {5,4}
+        };
+        List<Integer> res = main.findMinHeightTrees(6, input);
         System.out.println(res);
-
 //        List<Integer> l1 = new ArrayList<>();
 //        l1.add(1);
 //        l1.add(0);

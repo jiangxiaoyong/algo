@@ -1,9 +1,6 @@
 package Wednesday.Sunday.Graph;
 
 
-import Util.ListNode;
-import Util.TreeNode;
-
 import java.util.*;
 
 public class Main {
@@ -15,69 +12,111 @@ public class Main {
 
 
 /*
-        1
-       111
-      11111
-     1111111
-      11111
-       111
-        1
+                         1234560
+                           /\\\
+               1        12   123   1234   12345
+              /\       /\   /\
+        1+2  1+23 1+234
+        /\
+    1+2+3 1+2+34 1+2+345
  */
 
-
-    static class Radar {
-        double x, y, r;
-        Radar(double x, double y, double r) {
-            this.x = x;
-            this.y = y;
-            this.r = r;
+    static class Person {
+        String name;
+        int cost;
+        List<Person> neibs;
+        Person(String name, int cost) {
+            this.name = name;
+            this.cost = cost;
+            this.neibs = new LinkedList<>();
         }
     }
 
-    public boolean passAllRadar(List<Radar> radars) {
-        double[] minY = new double[1];
-        double[] maxY = new double[1];
-        minY[0] = 0.5;
-        maxY[0] = 0.5;
-        boolean[] visited = new boolean[radars.size()];
-        for (int i = 0; i < visited.length; i++) {
-            if (!visited[i]) {
-                visited[i] = true;
-                dfs(radars.get(i), radars, minY, maxY, visited);
-                if (minY[0] < 0 && maxY[0] > 1) {
-                    return false;
+    static class Node {
+        Person person;
+        int cost;
+        Node(Person person, int cost) {
+            this.person = person;
+            this.cost = cost;
+        }
+    }
+
+    static class BFSIterator implements Iterator<Person>{
+        PriorityQueue<Node> pq;
+        Set<Person> expanded;
+        Map<Person, Integer> generated;
+        BFSIterator(Person ceo) {
+            this.pq = new PriorityQueue<>(1, new Comparator<Node>() {
+                @Override
+                public int compare(Node o1, Node o2) {
+                    if (o1.cost == o2.cost) return 0;
+                    return o1.cost > o2.cost ? 1 : -1;
+                }
+            });
+            this.pq.offer(new Node(ceo, 0));
+            expanded = new HashSet<>();
+            generated = new HashMap<>();
+        }
+
+        @Override
+        public boolean hasNext() {
+            while (!this.pq.isEmpty() && expanded.contains(this.pq.peek())) {
+                this.pq.poll();
+            }
+            return !pq.isEmpty();
+        }
+
+        @Override
+        public Person next() {
+            if (!hasNext()) throw new RuntimeException("Empty");
+            Node cur = this.pq.poll();
+            expanded.add(cur.person);
+            for (Person neib : cur.person.neibs) {
+                if (expanded.contains(neib)) continue;
+                int cost = cur.cost + cur.person.cost;
+                if (!generated.containsKey(neib)) {
+                    this.pq.offer(new Node(neib, cost));
+                    generated.put(neib, cost);
+                } else if (cost < generated.get(neib)) {
+                    this.pq.offer(new Node(neib, cost));
+                    generated.put(neib, cost);
                 }
             }
-        }
-        return true;
-    }
-
-    public void dfs(Radar cur, List<Radar> radars, double[] minY, double[] maxY, boolean[] visited) {
-        for (int i = 0; i < radars.size(); i++) {
-            Radar next = radars.get(i);
-            if (!visited[i] && dis(cur, next) < cur.r + next.r) {
-                visited[i] = true;
-                minY[0] = Math.min(minY[0], next.y - next.r);
-                maxY[0] = Math.max(maxY[0], next.y + next.r);
-                dfs(next, radars, minY, maxY, visited);
-            }
+            return cur.person;
         }
     }
 
-    public double dis(Radar r1, Radar r2) {
-        return Math.sqrt(Math.pow(Math.abs(r1.x - r2.x),2.0) + Math.pow(Math.abs(r1.y - r2.y), 2.0));
-    }
 
     public static void main(String[] args) {
         Main main = new Main();
-        List<Radar> input = new LinkedList<>();
-        input.add(new Radar(0.6, 0.6, 0.1));
-        input.add(new Radar(0.5, 0.5, 0.2));
-        input.add(new Radar(0.3, 0.3, 0.5));
-        input.add(new Radar(0.8, 0.8, 0.5));
-        input.add(new Radar(10, 0.5, 0.1));
-        boolean res = main.passAllRadar(input);
-        System.out.println(res);
+        Person ceo = new Person("ceo", 10);
+        Person a1 = new Person("a1", 20);
+        Person a2 = new Person("a2", 10);
+        Person b1 = new Person("b1", 30);
+        Person b2 = new Person("b2", 1);
+        Person c1 = new Person("c1", 30);
+        Person d1 = new Person("d1", 2);
+        List<Person> ceolist = new LinkedList<>();
+        ceolist.add(a1);ceolist.add(a2);ceolist.add(b2);
+        ceo.neibs = ceolist;
+
+        List<Person> a1list = new LinkedList<>();
+        a1list.add(b1);a1list.add(b2);
+        a1.neibs = a1list;
+
+        List<Person> a2list = new LinkedList<>();
+        a2list.add(c1);
+        a2.neibs = a2list;
+
+        List<Person> b2list = new LinkedList<>();
+        b2list.add(d1);
+        b2.neibs = b2list;
+
+        BFSIterator it = new BFSIterator(ceo);
+        while (it.hasNext()) {
+            Person p = it.next();
+            System.out.println("cost:" + p.cost + " name:" + p.name);
+        }
     }
 }
 
@@ -852,5 +891,568 @@ public class Main {
         input.add(new Radar(10, 0.5, 0.1));
         boolean res = main.passAllRadar(input);
         System.out.println(res);
+    }
+ */
+
+/*
+    class Backtracking DFS3
+ */
+
+/*
+    Q7 算数表达式
+/*
+                         1234560
+                           /\\\
+               1        12   123   1234   12345
+              /\       /\   /\
+        1+2  1+23 1+234
+        /\
+    1+2+3 1+2+34 1+2+345
+
+    Given "123450"  add '+' so that form expression "12+3+45+0" = 60
+
+    public boolean formExpressionToTargetOnlyAdd(String str, int target) {
+        if (str == null || str.length() == 0) return false;
+        boolean[] res = new boolean[1];
+        dfs(str, 0, 0, target, res);
+        return res[0];
+    }
+
+    public void dfs(String str, int index, int sum, int target, boolean[] res) {
+        if (index >= str.length()) {
+            if (sum == target) {
+                res[0] = true;
+            }
+            return;
+        }
+
+        for (int i = index + 1; i <= str.length(); i++) {
+            String sub = str.substring(index, i);
+            int val = Integer.valueOf(sub);
+            dfs(str, i, sum + val, target, res);
+        }
+    }
+
+    public static void main(String[] args) {
+        Main main = new Main();
+        boolean res = main.formExpressionToTargetOnlyAdd("123450", 60);
+        System.out.println(res);
+    }
+ */
+
+/*
+    Problem of connectivity, DFS1,2/BFS1
+ */
+
+/*
+    Q1  围棋
+    -1: empty
+    1: black
+    0: white
+
+     11
+    1001
+     11
+
+    public boolean weiqiGame(int[][] matrix, int x, int y) {
+        boolean[][] visited = new boolean[matrix.length][matrix[0].length];
+        return isDead(matrix, visited, x, y);
+    }
+
+    public boolean isDead(int[][] matrix, boolean[][] visited, int x, int y) {
+        if (x < 0 || x >= matrix.length || y < 0 || y > matrix[0].length) {
+            return true;
+        }
+
+        if (matrix[x][y] == 1) return true;
+        if (matrix[x][y] == -1) return false;
+        if (visited[x][y]) return true;
+        visited[x][y] = true;
+
+        if (!isDead(matrix, visited, x + 1, y)) return false;
+        if (!isDead(matrix, visited, x - 1, y)) return false;
+        if (!isDead(matrix, visited, x, y + 1)) return false;
+        if (!isDead(matrix, visited, x, y - 1)) return false;
+        return true;
+    }
+
+    public static void main(String[] args) {
+        Main main = new Main();
+        int[][] matrix = new int[][] {
+                {-1,1,1,-1},
+                {1, 0,0, 1},
+                {-1,1,1,-1}
+        };
+        boolean res = main.weiqiGame(matrix, 1, 2);
+        System.out.println(res);
+    }
+ */
+
+/*
+    Q2  Continental Divider
+
+                {1,1,2,3,5},
+                {1,2,3,4,4},
+                {2,4,5,3,1},
+                {6,7,1,4,5},
+                {5,1,1,2,4}
+
+    find point that can be reachable from both left and right side,
+    water only flow from high to low
+
+    public List<Integer> continentalDivider(int[][] matrix) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        boolean[][] fromLeft = new boolean[rows][cols];
+        boolean[][] fromRight = new boolean[rows][cols];
+        for (int x = 0; x < matrix.length; x++) {
+            dfs(matrix, x, 0, fromLeft, Integer.MIN_VALUE);
+        }
+
+        for (int x = 0; x < matrix.length; x++) {
+            dfs(matrix, x, cols - 1, fromRight, Integer.MIN_VALUE);
+        }
+
+        //find intersection of two visited sets
+        List<Integer> list = new LinkedList<>();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (fromLeft[i][j] && fromRight[i][j]) {
+                    list.add(matrix[i][j]);
+                }
+            }
+        }
+        return list;
+    }
+
+    public void dfs(int[][] matrix, int i, int j, boolean[][] visited, int prev) {
+        if (i < 0 || i >= matrix.length || j < 0 ||j >= matrix[0].length || visited[i][j] || matrix[i][j] <= prev) return;
+        visited[i][j] = true;
+
+        dfs(matrix, i + 1, j, visited, matrix[i][j]);
+        dfs(matrix, i - 1, j, visited, matrix[i][j]);
+        dfs(matrix, i, j + 1, visited, matrix[i][j]);
+        dfs(matrix, i, j - 1, visited, matrix[i][j]);
+    }
+
+    public static void main(String[] args) {
+        Main main = new Main();
+        int[][] matrix = new int[][] {
+                {1,1,2,3,5},
+                {1,2,3,4,4},
+                {2,4,5,3,1},
+                {6,7,1,4,5},
+                {5,1,1,2,4}
+        };
+        List<Integer> list = main.continentalDivider(matrix);
+        for (int i : list) System.out.println(i);
+    }
+ */
+/*
+    Q1  Number of Lakes
+
+    Lake: surrounded by island:
+
+                {1,1,1,1,0},
+                {1,0,0,1,0},
+                {1,1,1,1,1},
+                {0,0,0,0,0}
+                # of lake: 1
+
+     public int numberOfLake(int[][] matrix) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        int count = 0;
+        boolean[][] visited = new boolean[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (matrix[i][j] == 0 && !visited[i][j] && !dfs(matrix, visited, i, j)) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    public boolean dfs(int[][] matrix, boolean[][] visited, int i, int j) {
+        if (i < 0 || i >= matrix.length || j < 0 || j >= matrix[0].length) return true;
+        if (matrix[i][j] == 1) return false;
+        if (visited[i][j]) return false;
+        visited[i][j] = true;
+
+        boolean toBoundry = false;
+        toBoundry |= dfs(matrix, visited, i + 1, j);
+        toBoundry |= dfs(matrix, visited, i - 1, j);
+        toBoundry |= dfs(matrix, visited, i, j + 1);
+        toBoundry |= dfs(matrix, visited, i, j - 1);
+        return toBoundry;
+    }
+
+    public static void main(String[] args) {
+        Main main = new Main();
+        int[][] matrix = new int[][] {
+                {1,1,1,1,0},
+                {1,0,0,1,0},
+                {1,1,1,1,1},
+                {0,0,0,0,0}
+        };
+        int res =main.numberOfLake(matrix);
+        System.out.println(res);
+    }
+ */
+
+/*
+    Q2 Largest island value
+
+    island value = sum of all the cell's value belong to the island
+                {1,4,0,0,0},
+                {2,0,3,0,0},
+                {0,0,5,0,0},
+                {0,0,0,6,1}
+                return 8
+
+    public int largestIslandValue(int[][] matrix) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        int max = 0;
+        boolean[][] visited = new boolean[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (matrix[i][j] != 0 && !visited[i][j]) {
+                    max = Math.max(max, dfs(matrix, visited, i, j));
+                }
+            }
+        }
+        return max;
+    }
+
+    public int dfs(int[][] matrix, boolean[][] visited, int i, int j) {
+        if (i < 0 || i >= matrix.length || j < 0 || j >= matrix[0].length || matrix[i][j] == 0) return 0;
+        if (visited[i][j]) return 0;
+        visited[i][j] = true;
+        int sum = matrix[i][j];
+        sum += dfs(matrix, visited, i + 1, j);
+        sum += dfs(matrix, visited, i - 1, j);
+        sum += dfs(matrix, visited, i, j + 1);
+        sum += dfs(matrix, visited, i, j - 1);
+        return sum;
+    }
+
+    public static void main(String[] args) {
+        Main main = new Main();
+        int[][] matrix = new int[][] {
+                {1,4,0,0,0},
+                {2,0,3,0,0},
+                {0,0,5,0,0},
+                {0,0,0,6,1}
+        };
+        int res =main.largestIslandValue(matrix);
+        System.out.println(res);
+    }
+ */
+
+/*
+    Q4  Minimum Tree Height
+
+    This is not optimal solution, O(n^2), run get height for each node, and record the min one
+    1 2 3
+    \ | /
+      4
+      |
+      5
+      /\
+     6  7
+     return [4,5]
+
+    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
+        List<Integer> res = new LinkedList<>();
+        if (edges == null || edges.length == 0) {
+            res.add(0);
+            return res;
+        }
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        for (int[] edge : edges) {
+            map.putIfAbsent(edge[0], new ArrayList<>());
+            map.putIfAbsent(edge[1], new ArrayList<>());
+            map.get(edge[0]).add(edge[1]);
+            map.get(edge[1]).add(edge[0]);
+        }
+        int min = Integer.MAX_VALUE;
+        for (int i = 0; i < n; i++) {
+            int height = dfs(i, map, -1);
+            if (height <= min) {
+                if (height < min) {
+                    res = new ArrayList<>();
+                }
+                res.add(i);
+                min = height;
+            }
+        }
+        return res;
+    }
+
+    public int dfs(int node, Map<Integer, List<Integer>> map, int parent) {
+        int maxHeight = 0;
+        for (int neib : map.get(node)) {
+            if (neib  != parent) {
+                maxHeight = Math.max(dfs(neib, map, node), maxHeight);
+            }
+        }
+        return maxHeight + 1;
+    }
+
+    public static void main(String[] args) {
+        Main main = new Main();
+        int[][] input = new int[][] {
+                {0,3},
+                {1,3},
+                {2,3},
+                {4,3},
+                {5,4}
+        };
+        List<Integer> res = main.findMinHeightTrees(6, input);
+        System.out.println(res);
+    }
+ */
+
+/*
+    Best first Search
+ */
+
+/*
+    Q2 Company notify all employee
+
+    ==> largest path sum in the tree
+
+    static class Person {
+        String name;
+        int cost;
+        List<Person> neibs;
+        Person(String name, int cost) {
+            this.name = name;
+            this.cost = cost;
+        }
+    }
+
+    public int minTimeNotifyCompanyWide(Person root) {
+        if (root == null) return 0;
+        int[] max = new int[1];
+        dfs(root, root.cost, max);
+        return max[0];
+    }
+
+    public void dfs(Person root, int sum, int[] max) {
+        if (root.neibs.size() == 1) {
+            max[0] = Math.max(max[0], sum);
+            return;
+        }
+        for (Person neib : root.neibs) {
+            dfs(neib, sum + neib.cost, max);
+        }
+    }
+
+
+    public static void main(String[] args) {
+        Main main = new Main();
+        Person ceo = new Person("ceo", 10);
+        Person a1 = new Person("a1", 20);
+        Person a2 = new Person("a2", 10);
+        Person b1 = new Person("b1", 30);
+        Person c1 = new Person("c1", 30);
+        b1.neibs = new LinkedList<>();
+        c1.neibs = new LinkedList<>();
+        List<Person> ceolist = new LinkedList<>();
+        ceolist.add(a1);ceolist.add(a2);
+        ceo.neibs = ceolist;
+
+        List<Person> a1list = new LinkedList<>();
+        a1list.add(b1);
+        a1.neibs = a1list;
+
+        List<Person> a2list = new LinkedList<>();
+        a2list.add(c1);
+        a2.neibs = a2list;
+        int res = main.minTimeNotifyCompanyWide(ceo);
+        System.out.println(res);
+    }
+ */
+
+/*
+    follow up 0, create iterator to output next person receive message
+
+     static class Person {
+        String name;
+        int cost;
+        List<Person> neibs;
+        Person(String name, int cost) {
+            this.name = name;
+            this.cost = cost;
+        }
+    }
+
+    static class BFSIterator implements Iterator<Person>{
+        PriorityQueue<Person> pq;
+        BFSIterator(Person ceo) {
+            pq = new PriorityQueue<>(1, new Comparator<Person>() {
+                @Override
+                public int compare(Person o1, Person o2) {
+                    if (o1.cost == o2.cost) return 0;
+                    return o1.cost - o2.cost > 0 ? 1 : -1;
+                }
+            });
+            pq.offer(ceo);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !pq.isEmpty();
+        }
+
+        @Override
+        public Person next() {
+            if (!hasNext()) throw new RuntimeException("Empty");
+            Person cur = this.pq.poll();
+            for (Person neib : cur.neibs) {
+                neib.cost += cur.cost;
+                this.pq.offer(neib);
+            }
+            return cur;
+        }
+    }
+
+
+    public static void main(String[] args) {
+        Main main = new Main();
+        Person ceo = new Person("ceo", 10);
+        Person a1 = new Person("a1", 20);
+        Person a2 = new Person("a2", 10);
+        Person b1 = new Person("b1", 30);
+        Person c1 = new Person("c1", 30);
+        b1.neibs = new LinkedList<>();
+        c1.neibs = new LinkedList<>();
+        List<Person> ceolist = new LinkedList<>();
+        ceolist.add(a1);ceolist.add(a2);
+        ceo.neibs = ceolist;
+
+        List<Person> a1list = new LinkedList<>();
+        a1list.add(b1);
+        a1.neibs = a1list;
+
+        List<Person> a2list = new LinkedList<>();
+        a2list.add(c1);
+        a2.neibs = a2list;
+        BFSIterator it = new BFSIterator(ceo);
+        while (it.hasNext()) {
+            Person p = it.next();
+            System.out.println("cost:" + p.cost + " name:" + p.name);
+        }
+    }
+ */
+
+/*
+    Follow up 2: has multiple report lines
+          CEO
+        /  | \
+       a1  |  a2
+       /\  |   |
+    b1   b2   c1
+          |
+         d1
+    static class Person {
+        String name;
+        int cost;
+        List<Person> neibs;
+        Person(String name, int cost) {
+            this.name = name;
+            this.cost = cost;
+            this.neibs = new LinkedList<>();
+        }
+    }
+
+    static class Node {
+        Person person;
+        int cost;
+        Node(Person person, int cost) {
+            this.person = person;
+            this.cost = cost;
+        }
+    }
+
+    static class BFSIterator implements Iterator<Person>{
+        PriorityQueue<Node> pq;
+        Set<Person> expanded;
+        Map<Person, Integer> generated;
+        BFSIterator(Person ceo) {
+            this.pq = new PriorityQueue<>(1, new Comparator<Node>() {
+                @Override
+                public int compare(Node o1, Node o2) {
+                    if (o1.cost == o2.cost) return 0;
+                    return o1.cost > o2.cost ? 1 : -1;
+                }
+            });
+            this.pq.offer(new Node(ceo, 0));
+            expanded = new HashSet<>();
+            generated = new HashMap<>();
+        }
+
+        @Override
+        public boolean hasNext() {
+            while (!this.pq.isEmpty() && expanded.contains(this.pq.peek())) {
+                this.pq.poll();
+            }
+            return !pq.isEmpty();
+        }
+
+        @Override
+        public Person next() {
+            if (!hasNext()) throw new RuntimeException("Empty");
+            Node cur = this.pq.poll();
+            expanded.add(cur.person);
+            for (Person neib : cur.person.neibs) {
+                if (expanded.contains(neib)) continue;
+                int cost = cur.cost + cur.person.cost;
+                if (!generated.containsKey(neib)) {
+                    this.pq.offer(new Node(neib, cost));
+                    generated.put(neib, cost);
+                } else if (cost < generated.get(neib)) {
+                    this.pq.offer(new Node(neib, cost));
+                    generated.put(neib, cost);
+                }
+            }
+            return cur.person;
+        }
+    }
+
+
+    public static void main(String[] args) {
+        Main main = new Main();
+        Person ceo = new Person("ceo", 10);
+        Person a1 = new Person("a1", 20);
+        Person a2 = new Person("a2", 10);
+        Person b1 = new Person("b1", 30);
+        Person b2 = new Person("b2", 1);
+        Person c1 = new Person("c1", 30);
+        Person d1 = new Person("d1", 2);
+        List<Person> ceolist = new LinkedList<>();
+        ceolist.add(a1);ceolist.add(a2);ceolist.add(b2);
+        ceo.neibs = ceolist;
+
+        List<Person> a1list = new LinkedList<>();
+        a1list.add(b1);a1list.add(b2);
+        a1.neibs = a1list;
+
+        List<Person> a2list = new LinkedList<>();
+        a2list.add(c1);
+        a2.neibs = a2list;
+
+        List<Person> b2list = new LinkedList<>();
+        b2list.add(d1);
+        b2.neibs = b2list;
+
+        BFSIterator it = new BFSIterator(ceo);
+        while (it.hasNext()) {
+            Person p = it.next();
+            System.out.println("cost:" + p.cost + " name:" + p.name);
+        }
     }
  */
