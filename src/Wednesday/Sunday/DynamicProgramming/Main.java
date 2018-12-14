@@ -13,37 +13,71 @@ public class Main {
 
 
 
-
-
-
-
-
-
-    static public int maxCoins(int[] nums) {
-        if (nums == null || nums.length == 0) return 0;
-        int n = nums.length;
-        int[] arr = new int[n + 2];
-        int[][] coins = new int[n + 2][n + 2];
-        for (int i = 0; i < n; i++) {
-            arr[i + 1] = nums[i];
+    static class Match {
+        boolean hasUp;
+        boolean hasLeft;
+        int longestFromUp;
+        int longestFromLeft;
+        public Match(int longestFromUp, int longestFromLeft, boolean hasUp, boolean hasLeft) {
+            this.hasUp = hasUp;
+            this.hasLeft = hasLeft;
+            this.longestFromUp = longestFromUp;
+            this.longestFromLeft = longestFromLeft;
         }
+    }
 
-        arr[0] = 1;
-        arr[n + 1] = 1;
 
-        for (int len = 1; len <= n; len++) {
-            for (int i = 1; i <= n - len + 1; i++) {
-                int j = i + len - 1;
-                for (int k = i; k <= j; k++) {
-                    coins[i][j] = Math.max(coins[i][j], coins[i][k - 1] + coins[k + 1][j] + arr[k] * arr[i - 1] * arr[j + 1]);
+    static int countMatchSquares(Match[][] matrix) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        int count = 0;
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                matrix[i][j].longestFromUp = matrix[i][j].hasUp ? matrix[i - 1][j].longestFromUp + 1 : 0;
+                matrix[i][j].longestFromLeft = matrix[i][j].hasLeft ? matrix[i][j - 1].longestFromLeft + 1 : 0;
+                int maxLen = Math.min(matrix[i][j].longestFromUp, matrix[i][j].longestFromLeft);
+                for (int k = 1; k <= maxLen; k++) {
+                    if (matrix[i - k][j].longestFromLeft >= k && matrix[i][j - k].longestFromUp >= k) {
+                        //  right top point, top edge             bottom right point, left edge
+                        count++;
+                    }
                 }
             }
         }
-        return coins[1][n];
+
+        return count;
     }
 
+
     public static void main(String[] args) {
-        int res = Main.maxCoins(new int[] {3,1,5,8});
+        Match[][] match = new Match[3][3];
+
+        Match match00 = new Match(0,0, false, false);
+        Match match01 = new Match(0, 1, false, true);
+        Match match02 = new Match(0, 2, false, true);
+
+        Match match10 = new Match(1, 0, true, false);
+        Match match11 = new Match(0, 1, false, true);
+        Match match12 = new Match(1, 2, true, true);
+
+        Match match20 = new Match(2, 0, true, false);
+        Match match21 = new Match(1, 1, true, true);
+        Match match22 = new Match(2,2, true, true);
+
+        match[0][0] = match00;
+        match[0][1] = match01;
+        match[0][2] = match02;
+
+        match[1][0] = match10;
+        match[1][1] = match11;
+        match[1][2] = match12;
+
+        match[2][0] = match20;
+        match[2][1] = match21;
+        match[2][2] = match22;
+
+        int res = Main.countMatchSquares(match);
         System.out.println(res);
     }
 }
@@ -209,6 +243,92 @@ public class Main {
 
     public static void main(String[] args) {
         int res = Main.numDecodings("1*");
+        System.out.println(res);
+    }
+ */
+
+
+/**
+ *  class about Matrix
+ */
+
+
+/*
+    Q1
+
+    How many squares in the matches shape
+
+    __.__.
+   |     |
+    __.__.
+   |  |  |
+    __.__.
+
+    static class Match {
+        boolean hasUp;
+        boolean hasLeft;
+        int longestFromUp;
+        int longestFromLeft;
+        public Match(int longestFromUp, int longestFromLeft, boolean hasUp, boolean hasLeft) {
+            this.hasUp = hasUp;
+            this.hasLeft = hasLeft;
+            this.longestFromUp = longestFromUp;
+            this.longestFromLeft = longestFromLeft;
+        }
+    }
+
+
+    static int countMatchSquares(Match[][] matrix) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        int count = 0;
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                matrix[i][j].longestFromUp = matrix[i][j].hasUp ? matrix[i - 1][j].longestFromUp + 1 : 0;
+                matrix[i][j].longestFromLeft = matrix[i][j].hasLeft ? matrix[i][j - 1].longestFromLeft + 1 : 0;
+                int maxLen = Math.min(matrix[i][j].longestFromUp, matrix[i][j].longestFromLeft);
+                for (int k = 1; k <= maxLen; k++) {
+                    if (matrix[i - k][j].longestFromLeft >= k && matrix[i][j - k].longestFromUp >= k) {
+                        //  right top point, top edge             bottom right point, left edge
+                        count++;
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
+
+    public static void main(String[] args) {
+        Match[][] match = new Match[3][3];
+
+        Match match00 = new Match(0,0, false, false);
+        Match match01 = new Match(0, 1, false, true);
+        Match match02 = new Match(0, 2, false, true);
+
+        Match match10 = new Match(1, 0, true, false);
+        Match match11 = new Match(0, 1, false, true);
+        Match match12 = new Match(1, 2, true, true);
+
+        Match match20 = new Match(2, 0, true, false);
+        Match match21 = new Match(1, 1, true, true);
+        Match match22 = new Match(2,2, true, true);
+
+        match[0][0] = match00;
+        match[0][1] = match01;
+        match[0][2] = match02;
+
+        match[1][0] = match10;
+        match[1][1] = match11;
+        match[1][2] = match12;
+
+        match[2][0] = match20;
+        match[2][1] = match21;
+        match[2][2] = match22;
+
+        int res = Main.countMatchSquares(match);
         System.out.println(res);
     }
  */
