@@ -13,74 +13,83 @@ public class Main {
 
 
 
-    static class Match {
-        boolean hasUp;
-        boolean hasLeft;
-        int longestFromUp;
-        int longestFromLeft;
-        public Match(int longestFromUp, int longestFromLeft, boolean hasUp, boolean hasLeft) {
-            this.hasUp = hasUp;
-            this.hasLeft = hasLeft;
-            this.longestFromUp = longestFromUp;
-            this.longestFromLeft = longestFromLeft;
-        }
-    }
 
 
-    static int countMatchSquares(Match[][] matrix) {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        int count = 0;
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                matrix[i][j].longestFromUp = matrix[i][j].hasUp ? matrix[i - 1][j].longestFromUp + 1 : 0;
-                matrix[i][j].longestFromLeft = matrix[i][j].hasLeft ? matrix[i][j - 1].longestFromLeft + 1 : 0;
-                int maxLen = Math.min(matrix[i][j].longestFromUp, matrix[i][j].longestFromLeft);
-                for (int k = 1; k <= maxLen; k++) {
-                    if (matrix[i - k][j].longestFromLeft >= k && matrix[i][j - k].longestFromUp >= k) {
-                        //  right top point, top edge             bottom right point, left edge
-                        count++;
-                    }
+
+
+
+
+
+
+
+    static public int distinctSubsequences(String s, String t) {
+        int[][] m = new int[s.length() + 1][t.length() + 1];
+        m[0][0] = 1;
+
+        for (int i = 1; i <= s.length(); i++) {
+            m[i][0] = 1;
+            for (int j = 1; j <= t.length(); j++) {
+                m[i][j] = m[i - 1][j];
+                if (s.charAt(i - 1) == t.charAt(j - 1)) {
+                    m[i][j] += m[i - 1][j - 1];
                 }
             }
         }
-
-        return count;
+        return m[s.length()][t.length()];
     }
 
-
     public static void main(String[] args) {
-        Match[][] match = new Match[3][3];
-
-        Match match00 = new Match(0,0, false, false);
-        Match match01 = new Match(0, 1, false, true);
-        Match match02 = new Match(0, 2, false, true);
-
-        Match match10 = new Match(1, 0, true, false);
-        Match match11 = new Match(0, 1, false, true);
-        Match match12 = new Match(1, 2, true, true);
-
-        Match match20 = new Match(2, 0, true, false);
-        Match match21 = new Match(1, 1, true, true);
-        Match match22 = new Match(2,2, true, true);
-
-        match[0][0] = match00;
-        match[0][1] = match01;
-        match[0][2] = match02;
-
-        match[1][0] = match10;
-        match[1][1] = match11;
-        match[1][2] = match12;
-
-        match[2][0] = match20;
-        match[2][1] = match21;
-        match[2][2] = match22;
-
-        int res = Main.countMatchSquares(match);
+        int res = Main.distinctSubsequences("rabbbit", "rabbit");
         System.out.println(res);
     }
 }
+
+
+/**
+ *  Typical dp problem
+ */
+/*
+    Q1  distinct sub-sequence
+
+    s = rabbbit
+    t = rabbit
+    return 3
+
+    rabbbit
+    ^^^ ^^^
+    rabbbit
+    ^^ ^^^^
+    rabbbit
+    ^^^^ ^^
+
+    dp[i][j] means number of distinct subsequence from s[0 - i-1] matching to t[0 - j-1]
+
+    dp[i][0] = 1  i>=0  (empty t)
+    dp[0][j] = 0 j >= 1  empty s, non empty t
+
+    static public int distinctSubsequences(String s, String t) {
+        int[][] m = new int[s.length() + 1][t.length() + 1]; //need to consider empty string, so + 1 length
+        m[0][0] = 1; //empty s matching empty t
+
+        for (int i = 1; i <= s.length(); i++) {
+            m[i][0] = 1;
+            for (int j = 1; j <= t.length(); j++) {
+                m[i][j] = m[i - 1][j];
+                if (s.charAt(i - 1) == t.charAt(j - 1)) {
+                    m[i][j] += m[i - 1][j - 1];
+                }
+            }
+        }
+        return m[s.length()][t.length()];
+    }
+
+    public static void main(String[] args) {
+        int res = Main.distinctSubsequences("rabbbit", "rabbit");
+        System.out.println(res);
+    }
+ */
+
 
 /*
     Class String/Character  Matching
@@ -329,6 +338,64 @@ public class Main {
         match[2][2] = match22;
 
         int res = Main.countMatchSquares(match);
+        System.out.println(res);
+    }
+ */
+
+/*
+    Q6 largest rectangle
+
+    1 1 1 1 1
+    0 1 1 1 1
+    0 1 0 1 1
+    1 1 1 1 0
+    0 1 1 1 1
+    return 8
+
+    static int largestRectangle(int[][] matrix) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        int max = 0;
+        for (int i = 0; i < rows; i++) {
+            int[] flatRow = new int[matrix[0].length];
+            for (int j = i; j < rows; j++) {
+                add(flatRow, matrix[j]);
+                int longestRepeatingNum = getLongestRepeatingNum(j - i + 1, flatRow);
+                max = Math.max(max, (j - i + 1) * longestRepeatingNum);
+            }
+        }
+        return max;
+    }
+
+    static public void add(int[] flatRow, int[] array) {
+        for (int i = 0; i < array.length; i++) {
+            flatRow[i] += array[i];
+        }
+    }
+
+    static public int getLongestRepeatingNum(int num, int[] array) {
+        int counter = 0;
+        int max = 0;
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == num) {
+                counter++;
+                max = Math.max(max, counter);
+            } else {
+                counter = 0;
+            }
+        }
+        return max;
+    }
+
+    public static void main(String[] args) {
+        int[][] matrix = new int[][] {
+                {1,1,1,1,1},
+                {0,1,1,1,1},
+                {0,1,0,1,1},
+                {1,1,1,1,0},
+                {0,1,1,1,1}
+        };
+        int res = Main.largestRectangle(matrix);
         System.out.println(res);
     }
  */
