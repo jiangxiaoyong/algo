@@ -25,51 +25,42 @@ public class Main {
 
 /*
 
-    xxx
-    xxx
 
 
-    0: left
-    1: up
-    2: down
+    1 [3,1,5,8] 1
+    0  1 2 3 4  5
+    i     k     j
+
+
+
+    dp[i][j] = max(arr[k] * array[i] * array[k] + dp[i][k] + dp[k][j] )
  */
 
-    static public int eatingPizza(int[] array) {
-        int n = array.length;
-        int[][] dp = new int[n][n];
+    static public int maxCoins(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        int n = nums.length;
+        int[][] m = new int[n + 2][n + 2];
+        int[] arr = new int[n + 2];
+        for (int i = 0; i < nums.length; i++) {
+            arr[i + 1] = nums[i];
+        }
+        arr[0] = 1;
+        arr[n + 1] = 1;
 
-        for (int i = n - 1; i >= 0; i--) {
-            for (int j = i; j < n; j++) {
-                if (i == j) {
-                    dp[i][j] = array[i];
-                } else if (i + 1 == j) {
-                    dp[i][j] = Math.max(array[i], array[j]);
-                } else {
-                    int pickLeft = 0;
-                    if (array[i + 1] < array[j]) {
-                        pickLeft = array[i] + dp[i + 1][j - 1];
-                    } else {
-                        pickLeft = array[i] + dp[i + 2][j];
-                    }
-
-                    int pickRight = 0;
-                    if (array[i] < array[j - 1]) {
-                        pickRight = array[j] + dp[i][j - 2];
-                    } else {
-                        pickRight = array[j] + dp[i + 1][j - 1];
-                    }
-                    dp[i][j] = Math.max(pickLeft, pickRight);
+        for (int i = n + 1; i >= 0; i--) {
+            for (int j = i + 2; j < n + 2; j++) {
+                for (int k = i + 1; k < j; k++) {
+                    m[i][j] = Math.max(m[i][j], arr[i] * arr[k] * arr[j] + m[i][k] + m[k][j]);
                 }
             }
         }
-        return dp[0][n - 1];
+        return m[0][n + 1];
     }
 
     public static void main(String[] args) {
-        int res = Main.eatingPizza(new int[] {5,3,1,4});
+        int res = Main.maxCoins(new int[] {3,1,5,8});
         System.out.println(res);
     }
-
 }
 
 
@@ -1135,6 +1126,41 @@ prefix    [0,1,3,0, 4,9]
 
     public static void main(String[] args) {
         int res = Main.robotMoveMinObstaclesRemoved(2, 3, 3);
+        System.out.println(res);
+    }
+ */
+
+/*
+    Q6  Harry potter
+
+    dp[i][j] the min HP required when entering (i,j) from bottom right to top left
+
+    right: max(dp[i][j + 1] - matrix[i][j], 1)
+    down:  max(dp[i + 1][j] - matrix[i][j], 1)
+    dp[i][j] = min(right, down)
+
+    static public int harryPotter(int[][] matrix) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        int[][] dp = new int[rows][cols];
+        for (int i = rows - 1; i >= 0; i--) {
+            for (int j = cols - 1; j >= 0; j--) {
+                if (i == 0 && j == 0) Math.max(1 - matrix[rows - 1][cols - 1], 1);
+                int right = j + 1 < cols ? Math.max(dp[i][j + 1] - matrix[i][j], 1) : Integer.MAX_VALUE;
+                int down = i + 1 < rows ? Math.max(dp[i + 1][j] - matrix[i][j], 1) : Integer.MAX_VALUE;
+                dp[i][j] = Math.min(right, down);
+            }
+        }
+        return dp[0][0];
+    }
+
+    public static void main(String[] args) {
+        int[][] matrix = new int[][] {
+                {-1,2,3},
+                {-3,4,-2},
+                {1,3,2}
+        };
+        int res = Main.harryPotter(matrix);
         System.out.println(res);
     }
  */

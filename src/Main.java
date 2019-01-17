@@ -1,5 +1,6 @@
-import Util.ListNode;
 import Util.TreeNode;
+import sun.awt.image.ImageWatched;
+
 import java.util.*;
 import java.util.List;
 
@@ -557,53 +558,86 @@ Input:
 //        dfs(m, i, j - 1, count + 1, visited, des, rows, cols);
 //    }
 
-    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
-        List<Integer> res = new LinkedList<>();
-        if (edges == null || edges.length == 0) {
-            res.add(0);
-            return res;
-        }
-        Map<Integer, List<Integer>> map = new HashMap<>();
-        for (int[] edge : edges) {
-            map.putIfAbsent(edge[0], new ArrayList<>());
-            map.putIfAbsent(edge[1], new ArrayList<>());
-            map.get(edge[0]).add(edge[1]);
-            map.get(edge[1]).add(edge[0]);
-        }
-        int min = Integer.MAX_VALUE;
-        for (int i = 0; i < n; i++) {
-            int height = dfs(i, map, -1);
-            if (height <= min) {
-                if (height < min) {
-                    res = new ArrayList<>();
-                }
-                res.add(i);
-                min = height;
-            }
-        }
-        return res;
-    }
+    /*
 
-    public int dfs(int node, Map<Integer, List<Integer>> map, int parent) {
-        int maxHeight = 0;
-        for (int neib : map.get(node)) {
-            if (neib  != parent) {
-                maxHeight = Math.max(dfs(neib, map, node), maxHeight);
+
+
+        m[i][j] longest palindromic subseq at index i and j
+
+        induction rule:
+                if s(i) == s(j)    m[i][j] = m[i + 1][j - 1] + 2
+                else                m[i][j] = Math.max(m[i + 1][j], m[i][j - 1]
+
+       x x x x x x
+       x x x x x x
+       x x x x x x
+
+       base case:
+                    m[i][j]  = 1  if i == j
+                    m[i][j] =  2  i + 1 = j && s(i) == s(j)
+
+
+         1 3 2 4
+           f
+             s
+     */
+
+    /*
+
+        ab   redred
+
+
+Input:
+org: [4,1,5,2,6,3], seqs: [[5,2,6,3],[4,1,5,2]]
+     */
+
+    public boolean sequenceReconstruction(int[] org, List<List<Integer>> seqs) {
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        Map<Integer, Integer> indegree = new HashMap<>();
+        for (List<Integer> seq : seqs) {
+            for (int i = 0; i < seq.size() - 1; i++) {
+                map.putIfAbsent(seq.get(i), new ArrayList<>());
+                indegree.put(seq.get(i), indegree.getOrDefault(seq.get(i), 0));
+                if (i == 0) continue;
+                map.putIfAbsent(seq.get(i + 1), new ArrayList<>());
+                indegree.put(seq.get(i + 1), indegree.getOrDefault(seq.get(i + 1), 0) + 1);
+                map.get(seq.get(i)).add(seq.get(i + 1));
             }
         }
-        return maxHeight + 1;
+
+        int index = 0;
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(org[0]);
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            if (size > 1) return false;
+            int cur = queue.poll();
+            if (cur != org[index]) return false;
+
+            for (int neib : map.get(cur)) {
+                int degree = indegree.get(neib);
+                indegree.put(neib, degree - 1);
+                if (indegree.get(neib) == 0) {
+                    queue.offer(neib);
+                }
+            }
+            index++;
+        }
+        return index == org.length;
     }
 
     public static void main(String[] args) {
         Main main = new Main();
-        int[][] input = new int[][] {
-                {0,3},
-                {1,3},
-                {2,3},
-                {4,3},
-                {5,4}
-        };
-        List<Integer> res = main.findMinHeightTrees(6, input);
+        List<List<Integer>> list = new LinkedList<>();
+        List<Integer> l1 = new LinkedList<>();
+        l1.add(1);l1.add(2);
+        //l1.add(5);l1.add(2);l1.add(6);l1.add(3);
+        List<Integer> l2 = new LinkedList<>();
+        l2.add(1);l2.add(3);
+        //l2.add(4);l2.add(1);l2.add(5);l2.add(2);
+        list.add(l1);
+        list.add(l2);
+        boolean res = main.sequenceReconstruction(new int[] {1,2,3}, list);
         System.out.println(res);
 //        List<Integer> l1 = new ArrayList<>();
 //        l1.add(1);
