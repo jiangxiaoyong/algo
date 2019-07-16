@@ -24,12 +24,25 @@ public class Main {
 
 
 /*
+    dp[i][j] represent # distinct sub seq
+    if s at i  == t at j
+    dp[i][j] += dp[i - 1][j - 1]
 
+    dp[i][j] += dp[i - 1][j]
 
 
     1 [3,1,5,8] 1
     0  1 2 3 4  5
     i     k     j
+
+    11
+    aa
+    k
+    11(*)
+        * = 1:
+            aaa, ka, ak
+        * = 2:
+            aab  kb, a(12)
 
 
 
@@ -1004,6 +1017,9 @@ prefix    [0,1,3,0, 4,9]
 
     static public int waysMoveUpDownRightEachCellAppearedAtMostOnce(int rows, int cols) {
         int[][][] dp = new int[rows][cols][3];
+
+        //base case no from left direction on 0 rows, b.c. element on 0 rows may from left and down
+        //However, 0 cols, can only from up
         //base case for up direction, 0 column should be 1
         for (int i = 0; i < rows; i++) {
             dp[i][0][1] = 1;

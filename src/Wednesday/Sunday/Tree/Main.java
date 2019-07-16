@@ -52,19 +52,31 @@ public class Main {
     post-order   FGHB   IC  JKD  E A
      */
 
-
-    public TreeNode deleteNodeInRange(TreeNode root, int min, int max) {
+    public TreeNode deleteNodeInRange(TreeNode root, int min, int max, int left, int right) {
         if (root == null) return null;
         if (root.val < min) {
-            return deleteNodeInRange(root.right, min, max);
+            return deleteNodeInRange(root.right, min, max, root.val, right);
+        } else if (root.val > max) {
+            return deleteNodeInRange(root.left, min, max, left, root.val);
         }
-        if (root.val > max) {
-            return deleteNodeInRange(root.left, min, max);
-        }
-        root.left = deleteNodeInRange(root.left, min, max);
-        root.right = deleteNodeInRange(root.right, min, max);
+        if (root.val > left && root.val < right) return root;
+        root.left = deleteNodeInRange(root.left, min, max, left, root.val);
+        root.right = deleteNodeInRange(root.right, min, max, root.val, right);
         return root;
     }
+
+//    public TreeNode deleteNodeInRange(TreeNode root, int min, int max) {
+//        if (root == null) return null;
+//        if (root.val < min) {
+//            return deleteNodeInRange(root.right, min, max);
+//        }
+//        if (root.val > max) {
+//            return deleteNodeInRange(root.left, min, max);
+//        }
+//        root.left = deleteNodeInRange(root.left, min, max);
+//        root.right = deleteNodeInRange(root.right, min, max);
+//        return root;
+//    }
 
 
     public static void main(String[] args) {

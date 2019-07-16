@@ -119,26 +119,26 @@ public class Main {
         16/3
     0.9 * 0.9 = 0.81
 
-      0.9 * 0.9 = 0.81
+      num < 1:  left : num, right 1
+      num > 1:  left : 1, right : num
+
      */
     public double sqrtInteger(double num) {
         if (num == 1) return 1;
-        double left = 1;
-        double right = num;
-        if (num < 1) {
-            left = num;
-            right = 1;
-        }
-        double delta = 0.01;
+
+        double left = num > 1 ? 1 : num;
+        double right = num > 1 ? num : 1;
+
+        double delta = 0.1;
         while (true) {
-            double mid = left + (right - left) /2;
-            double diff = (mid * mid - num) / num;
-            if (Math.abs(diff) < delta) {
+            double mid = left + (right - left) / 2;
+            if (Math.abs(num - mid * mid) / num < 0.1) {
                 return mid;
-            } else if (diff > 0) {
-                right = mid;
-            } else {
+            }
+            if (mid * mid < num) {
                 left = mid;
+            } else {
+                right = mid;
             }
         }
     }

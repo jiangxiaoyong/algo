@@ -1,6 +1,11 @@
+import Util.Interval;
 import Util.TreeNode;
+import apple.laf.JRSUIUtils;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.sun.tools.javac.util.Log;
 import sun.awt.image.ImageWatched;
 
+import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.List;
 
@@ -583,83 +588,26 @@ Input:
      */
 
     /*
+            [a,b,a]
+              /\
+          aba       baa         aba
+          /\        /\          /\
+        aba aab    baa baa    aba aab
 
-        ab   redred
-
-
-Input:
-org: [4,1,5,2,6,3], seqs: [[5,2,6,3],[4,1,5,2]]
      */
 
-    public boolean sequenceReconstruction(int[] org, List<List<Integer>> seqs) {
-        Map<Integer, List<Integer>> map = new HashMap<>();
-        Map<Integer, Integer> indegree = new HashMap<>();
-        for (List<Integer> seq : seqs) {
-            for (int i = 0; i < seq.size() - 1; i++) {
-                map.putIfAbsent(seq.get(i), new ArrayList<>());
-                indegree.put(seq.get(i), indegree.getOrDefault(seq.get(i), 0));
-                if (i == 0) continue;
-                map.putIfAbsent(seq.get(i + 1), new ArrayList<>());
-                indegree.put(seq.get(i + 1), indegree.getOrDefault(seq.get(i + 1), 0) + 1);
-                map.get(seq.get(i)).add(seq.get(i + 1));
-            }
-        }
+/*
+    [1,1,1] k = 2
+     1 2 3
 
-        int index = 0;
-        Queue<Integer> queue = new LinkedList<>();
-        queue.add(org[0]);
-        while (!queue.isEmpty()) {
-            int size = queue.size();
-            if (size > 1) return false;
-            int cur = queue.poll();
-            if (cur != org[index]) return false;
+     Input: ["flower","flow","flight"]
+     Output: "fl"
 
-            for (int neib : map.get(cur)) {
-                int degree = indegree.get(neib);
-                indegree.put(neib, degree - 1);
-                if (indegree.get(neib) == 0) {
-                    queue.offer(neib);
-                }
-            }
-            index++;
-        }
-        return index == org.length;
-    }
+*/
+
+
 
     public static void main(String[] args) {
         Main main = new Main();
-        List<List<Integer>> list = new LinkedList<>();
-        List<Integer> l1 = new LinkedList<>();
-        l1.add(1);l1.add(2);
-        //l1.add(5);l1.add(2);l1.add(6);l1.add(3);
-        List<Integer> l2 = new LinkedList<>();
-        l2.add(1);l2.add(3);
-        //l2.add(4);l2.add(1);l2.add(5);l2.add(2);
-        list.add(l1);
-        list.add(l2);
-        boolean res = main.sequenceReconstruction(new int[] {1,2,3}, list);
-        System.out.println(res);
-//        List<Integer> l1 = new ArrayList<>();
-//        l1.add(1);
-//        l1.add(0);
-//        l1.add(0);
-//
-//        List<Integer> l2 = new ArrayList<>();
-//        l2.add(1);
-//        l2.add(0);
-//        l2.add(0);
-//
-//        List<Integer> l3 = new ArrayList<>();
-//        l3.add(1);
-//        l3.add(9);
-//        l3.add(1);
-//
-//        List<List<Integer>> list = new ArrayList<>();
-//        list.add(l1);
-//        list.add(l2);
-//        list.add(l3);
-//
-//        int res = main.minimumDistance(3,3, list);
-//        System.out.println(res);
     }
 }
